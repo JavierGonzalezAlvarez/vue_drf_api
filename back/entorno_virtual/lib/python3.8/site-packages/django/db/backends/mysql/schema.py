@@ -68,6 +68,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return self._is_limited_data_type(field)
         return False
 
+    def skip_default_on_alter(self, field):
+        if self._is_limited_data_type(field) and not self.connection.mysql_is_mariadb:
+            # MySQL doesn't support defaults for BLOB and TEXT in the
+            # ALTER COLUMN statement.
+            return True
+        return False
+
     @property
     def _supports_limited_data_type_defaults(self):
         # MariaDB >= 10.2.1 and MySQL >= 8.0.13 supports defaults for BLOB
@@ -100,7 +107,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             }, [effective_default])
 
     def _field_should_be_indexed(self, model, field):
-        create_index = super()._field_should_be_indexed(model, field)
+        if not super()._field_should_be_indexed(model, field):
+            return False
+
         storage = self.connection.introspection.get_storage_engine(
             self.connection.cursor(), model._meta.db_table
         )
@@ -108,11 +117,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # db_constraint=False because the index from that constraint won't be
         # created.
         if (storage == "InnoDB" and
-                create_index and
                 field.get_internal_type() == 'ForeignKey' and
                 field.db_constraint):
             return False
-        return not self._is_limited_data_type(field) and create_index
+        return not self._is_limited_data_type(field)
 
     def _delete_composed_index(self, model, fields, *args):
         """
