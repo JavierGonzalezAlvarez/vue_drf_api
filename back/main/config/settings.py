@@ -102,8 +102,7 @@ DATABASES = {
     #
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # 'NAME': 'apiumm',
-        'NAME': 'apiultramar',
+        'NAME': 'apiumm',
         'USER': 'javier',
         'PASSWORD': '2525_ap',
         'HOST': 'localhost',
