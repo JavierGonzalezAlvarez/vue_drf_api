@@ -14,7 +14,6 @@ from django.http import (
 )
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.decorators import method_decorator
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
@@ -76,9 +75,6 @@ class AdminSite:
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
         all_sites.add(self)
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}(name={self.name!r})'
 
     def check(self, app_configs):
         """
@@ -361,6 +357,7 @@ class AdminSite:
         """
         return JavaScriptCatalog.as_view(packages=['django.contrib.admin'])(request)
 
+    @never_cache
     def logout(self, request, extra_context=None):
         """
         Log out the user for the given HttpRequest.
@@ -382,7 +379,7 @@ class AdminSite:
         request.current_app = self.name
         return LogoutView.as_view(**defaults)(request)
 
-    @method_decorator(never_cache)
+    @never_cache
     def login(self, request, extra_context=None):
         """
         Display the login form for the given HttpRequest.
@@ -423,13 +420,14 @@ class AdminSite:
     def catch_all_view(self, request, url):
         if settings.APPEND_SLASH and not url.endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
+            path = '%s/' % request.path_info
             try:
-                match = resolve('%s/' % request.path_info, urlconf)
+                match = resolve(path, urlconf)
             except Resolver404:
                 pass
             else:
                 if getattr(match.func, 'should_append_slash', True):
-                    return HttpResponsePermanentRedirect('%s/' % request.path)
+                    return HttpResponsePermanentRedirect(path)
         raise Http404
 
     def _build_app_dict(self, request, label=None):
@@ -463,7 +461,6 @@ class AdminSite:
 
             info = (app_label, model._meta.model_name)
             model_dict = {
-                'model': model,
                 'name': capfirst(model._meta.verbose_name_plural),
                 'object_name': model._meta.object_name,
                 'perms': perms,
@@ -517,6 +514,7 @@ class AdminSite:
 
         return app_list
 
+    @never_cache
     def index(self, request, extra_context=None):
         """
         Display the main admin index page, which lists all of the installed
@@ -527,7 +525,6 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': self.index_title,
-            'subtitle': None,
             'app_list': app_list,
             **(extra_context or {}),
         }
@@ -545,7 +542,6 @@ class AdminSite:
         context = {
             **self.each_context(request),
             'title': _('%(app)s administration') % {'app': app_dict['name']},
-            'subtitle': None,
             'app_list': [app_dict],
             'app_label': app_label,
             **(extra_context or {}),
@@ -563,9 +559,6 @@ class DefaultAdminSite(LazyObject):
     def _setup(self):
         AdminSiteClass = import_string(apps.get_app_config('admin').default_site)
         self._wrapped = AdminSiteClass()
-
-    def __repr__(self):
-        return repr(self._wrapped)
 
 
 # This global object represents the default admin site, for the common case.

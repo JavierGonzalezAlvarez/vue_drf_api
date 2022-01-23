@@ -14,8 +14,23 @@ from main.apps.booking.models import LoadingPort, DischargePort, Booking, Vehicl
 from .serializer import LoadingPortSerializer, DischargePortSerializer, \
     VehicleSerializer, BookingSerializer
 
+'''
+# set a lifetime for token, custom token
+from rest_framework_simplejwt.views import TokenViewBase
+from .serializer import TokenObtainLifetimeSerializer, TokenRefreshLifetimeSerializer
+
+
+class TokenObtainPairView(TokenViewBase):
+    serializer_class = TokenObtainLifetimeSerializer
+
+
+class TokenRefreshView(TokenViewBase):
+    serializer_class = TokenRefreshLifetimeSerializer
+'''
 
 # ModelviewSet me permite put, get patch, put
+
+
 class LoadingPortViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = LoadingPort.objects.all().order_by('id')

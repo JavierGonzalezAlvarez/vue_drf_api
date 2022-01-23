@@ -26,6 +26,7 @@ $ pip install -r requirements.txt
 I've got an user in my postgres in local, called javier with password: 2525_ap
 Change postgres'configuration as your convinience.
 $ psql -d postgres -U javier
+
 -create DB
 CREATE DATABASE apiumm WITH OWNER javier;
 -change settings in django:
@@ -79,3 +80,6 @@ http://localhost:8000/api/v1/
 ## run tests
 -------------------------------
 $ back/python3 manage.py test ./main/apps/booking/test
+
+## JWT
+https://django-rest-framework-simplejwt.readthedocs.io/en/latest/

@@ -17,7 +17,7 @@
         </h1>
 
         <h2 class="subheading font-weight-regular">
-          We can use a CRUD in these comnponents, as follows:
+          We can use a CRUD in these components, as follows:
           <ul>
             <li>Loading Port</li>
             <li>Discharge Port</li>

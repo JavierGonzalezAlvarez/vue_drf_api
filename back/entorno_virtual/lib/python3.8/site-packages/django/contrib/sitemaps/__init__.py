@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
@@ -8,7 +7,6 @@ from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch, reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango50Warning
 
 PING_URL = "https://www.google.com/webmasters/tools/ping"
 
@@ -124,16 +122,6 @@ class Sitemap:
 
     def get_protocol(self, protocol=None):
         # Determine protocol
-        if self.protocol is None and protocol is None:
-            warnings.warn(
-                "The default sitemap protocol will be changed from 'http' to "
-                "'https' in Django 5.0. Set Sitemap.protocol to silence this "
-                "warning.",
-                category=RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-        # RemovedInDjango50Warning: when the deprecation ends, replace 'http'
-        # with 'https'.
         return self.protocol or protocol or 'http'
 
     def get_domain(self, site=None):
@@ -180,13 +168,13 @@ class Sitemap:
                 'lastmod': lastmod,
                 'changefreq': self._get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
-                'alternates': [],
             }
 
             if self.i18n and self.alternates:
+                alternates = []
                 for lang_code in self._languages():
                     loc = f'{protocol}://{domain}{self._location(item, lang_code)}'
-                    url_info['alternates'].append({
+                    alternates.append({
                         'location': loc,
                         'lang_code': lang_code,
                     })
@@ -194,10 +182,11 @@ class Sitemap:
                     lang_code = settings.LANGUAGE_CODE
                     loc = f'{protocol}://{domain}{self._location(item, lang_code)}'
                     loc = loc.replace(f'/{lang_code}/', '/', 1)
-                    url_info['alternates'].append({
+                    alternates.append({
                         'location': loc,
                         'lang_code': 'x-default',
                     })
+                url_info['alternates'] = alternates
 
             urls.append(url_info)
 
