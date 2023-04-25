@@ -28,12 +28,12 @@ Change postgres'configuration as your convinience.
 $ psql -d postgres -U javier
 
 -create DB
-CREATE DATABASE apiumm WITH OWNER javier;
+CREATE DATABASE apiumm WITH OWNER test;
 -change settings in django:
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'apiumm',
-        'USER': 'javier',
+        'USER': 'test',
         'PASSWORD': '2525_ap',
         'HOST': 'localhost',
         'PORT': '5432'
@@ -47,7 +47,7 @@ $ python3 manage.py migrate
 ------------------------------
 $ python3 manage.py createsuperuser
 user: javier
-pss: 89_Lp%wD
+pss: javier
 
 # run the server
 ------------------------------

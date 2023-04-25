@@ -103,7 +103,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'apiumm',
-        'USER': 'javier',
+        'USER': 'test',
         'PASSWORD': '2525_ap',
         'HOST': 'localhost',
         'PORT': '5432'
